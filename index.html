@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中國1美食配對遊戲</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #FFF8E6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #5C3317;
+        }
+        h1 {
+            color: #8B0000;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .game-container {
+            background-color: #FFFFFF;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px auto;
+        }
+        .card {
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card-back {
+            background: url('https://pic.616pic.com/bg_w1180/00/01/75/0i6LldJVYs.jpg!/fw/1120') center/cover;
+            background-color: #CD5C5C;
+            color: white;
+            font-weight: bold;
+        }
+        .card-front {
+            background-color: #FFE4C4;
+            transform: rotateY(180deg);
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card.matched {
+            cursor: default;
+        }
+        .card.matched .card-front {
+            background-color: #98FB98;
+        }
+        .card.matched::after {
+            content: "✓";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #006400;
+            font-size: 16px;
+            transform: rotateY(180deg);
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .card .text {
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .controls {
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 8px 20px;
+            background-color: #CD5C5C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #8B0000;
+        }
+        .message {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            min-height: 20px;
+            color: #8B0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>中國美食配對遊戲</h1>
+    
+    <div class="game-container">
+        <div class="game-board" id="game-board"></div>
+        
+        <div class="game-info">
+            <div id="moves">移動次數: 0</div>
+            <div id="timer">時間: 0秒</div>
+            <div id="pairs">已配對: 0/4</div>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="controls">
+            <button id="reset-btn" class="btn">重新開始</button>
+        </div>
+    </div>
+
+    <script>
+        // 遊戲資料 - 使用穩定的圖片連結
+        const gameItems = [
+            // 冰糖葫蘆
+            { id: 1, type: 'image', content: 'https://downloads.ctfassets.net/pl05rcmbdryr/35ux6iYvZMz7uzdWpl83Iw/2a10234ce67ae9fbb0f30ef09d89e6b3/shutterstock_1277494621.jpg?w=1920&q=75&fm=webp', pair: 2 },
+            { id: 2, type: 'text', content: '冰糖葫蘆', pair: 1 },
+            
+            // 北京烤鴨
+            { id: 3, type: 'image', content: 'https://downloads.ctfassets.net/pl05rcmbdryr/3rThcZblFr9TMMZ4rPSed4/d9065e6fe13577a69a778eb517a62137/shutterstock_2323840107.jpg?w=1920&q=75&fm=webp', pair: 4 },
+            { id: 4, type: 'text', content: '北京烤鴨', pair: 3 },
+            
+            // 狗不理包子
+            { id: 5, type: 'image', content: 'https://i.epochtimes.com/assets/uploads/2021/03/id12843786-42ca4352aa-.jpg', pair: 6 },
+            { id: 6, type: 'text', content: '狗不理包子', pair: 5 },
+            
+            // 面條
+            { id: 7, type: 'image', content: 'https://resource.zhoudaosh.com/files/cimages/2019/20190621/ead5a04599aba35b4b1e6647214248f121175275.jpg!shoudaosh_img', pair: 8 },
+            { id: 8, type: 'text', content: '面條', pair: 7 },
+            
+            // 空白卡片(為了湊3x3)
+            { id: 9, type: 'image', content: 'https://img.ltn.com.tw/Upload/health/page/800/2023/07/12/phpLASKRP.jpg', pair: 9 }
+        ];
+
+        // 遊戲狀態
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let seconds = 0;
+        let timerInterval = null;
+
+        // 初始化遊戲
+        function initGame() {
+            const gameBoard = document.getElementById('game-board');
+            
+            // 重置遊戲狀態
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            seconds = 0;
+            document.getElementById('moves').textContent = '移動次數: 0';
+            document.getElementById('timer').textContent = '時間: 0秒';
+            document.getElementById('pairs').textContent = '已配對: 0/4';
+            document.getElementById('message').textContent = '';
+            
+            // 停止之前的計時器
+            if (timerInterval) clearInterval(timerInterval);
+            
+            // 開始新計時器
+            timerInterval = setInterval(() => {
+                seconds++;
+                document.getElementById('timer').textContent = `時間: ${seconds}秒`;
+            }, 1000);
+            
+            // 清空遊戲台
+            gameBoard.innerHTML = '';
+            
+            // 洗牌
+            const shuffledItems = [...gameItems].sort(() => Math.random() - 0.5);
+            
+            // 創建卡片
+            shuffledItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.id = item.id;
+                card.dataset.pair = item.pair;
+                
+                // 卡片背面
+                const cardBack = document.createElement('div');
+                cardBack.className = 'card-face card-back';
+                cardBack.textContent = '中國美食';
+                card.appendChild(cardBack);
+                
+                // 卡片正面
+                const cardFront = document.createElement('div');
+                cardFront.className = 'card-face card-front';
+                
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.content;
+                    img.alt = getAltText(item.content);
+                    cardFront.appendChild(img);
+                } else if (item.type === 'text') {
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'text';
+                    textDiv.textContent = item.content;
+                    cardFront.appendChild(textDiv);
+                }
+                
+                card.appendChild(cardFront);
+                
+                if (item.type !== 'blank') {
+                    card.addEventListener('click', flipCard);
+                } else {
+                    // 空白卡片
+                    card.style.visibility = 'hidden';
+                    card.style.cursor = 'default';
+                }
+                
+                gameBoard.appendChild(card);
+            });
+        }
+
+        // 獲取圖片alt文本
+        function getAltText(imgSrc) {
+            if (imgSrc.includes('tanghulu')) return '冰糖葫蘆';
+            if (imgSrc.includes('duck')) return '北京烤鴨';
+            if (imgSrc.includes('buns')) return '狗不理包子';
+            if (imgSrc.includes('noodles')) return '面條';
+            return '中國美食圖片';
+        }
+
+        // 翻轉卡片
+        function flipCard() {
+            // 如果已經翻開或已配對，則不處理
+            if (this.classList.contains('flipped')) return;
+            if (this.classList.contains('matched')) return;
+            
+            // 如果已經翻開兩張卡片，則不處理
+            if (flippedCards.length === 2) return;
+            
+            // 翻開卡片
+            this.classList.add('flipped');
+            flippedCards.push(this);
+            
+            // 如果翻開了兩張卡片，檢查是否配對
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = `移動次數: ${moves}`;
+                
+                const card1 = flippedCards[0];
+                const card2 = flippedCards[1];
+                
+                if (card1.dataset.pair === card2.dataset.id || card2.dataset.pair === card1.dataset.id) {
+                    // 配對成功
+                    setTimeout(() => {
+                        card1.classList.add('matched');
+                        card2.classList.add('matched');
+                        flippedCards = [];
+                        matchedPairs++;
+                        
+                        document.getElementById('pairs').textContent = `已配對: ${matchedPairs}/4`;
+                        document.getElementById('message').textContent = '配對成功！';
+                        document.getElementById('message').style.color = 'green';
+                        
+                        // 檢查遊戲是否結束
+                        if (matchedPairs === 4) {
+                            clearInterval(timerInterval);
+                            setTimeout(() => {
+                                document.getElementById('message').textContent = 
+                                    `遊戲完成！用時 ${seconds} 秒，移動 ${moves} 次`;
+                            }, 500);
+                        }
+                    }, 300);
+                } else {
+                    // 配對失敗
+                    document.getElementById('message').textContent = '配對失敗，再試一次！';
+                    document.getElementById('message').style.color = 'red';
+                    
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+
+        // 重置遊戲
+        document.getElementById('reset-btn').addEventListener('click', initGame);
+
+        // 開始遊戲
+        initGame();
+    </script>
+</body>
+</html>
