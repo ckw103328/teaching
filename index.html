@@ -541,7 +541,7 @@
             
             <div class="feedback">😢</div>
             <div class="game-over">
-                <div>游戲結束!</div>
+                <div>遊戲結束!</div>
                 <div class="score">成功守衛: <span id="saved-count">0</span>/7</div>
             </div>
         </div>
@@ -766,11 +766,11 @@
                     showCelebration();
                     
                     // 显示胜利消息
-                    gameOver.innerHTML = '<div>太棒了!</div><div>你成功守卫了所有北京美食!</div>';
+                    gameOver.innerHTML = '<div>太棒了!</div><div>你成功守衛了所有北京美食!</div>';
                     gameOver.style.display = 'flex';
                 } else {
                     // 显示失败消息
-                    gameOver.innerHTML = '<div>游戏结束!</div><div>成功守卫: ' + savedFoods + '/7</div>';
+                    gameOver.innerHTML = '<div>遊戲結束!</div><div>成功守衛了北京美食: ' + savedFoods + '/7</div>';
                     gameOver.style.display = 'flex';
                 }
             }
@@ -846,5 +846,6 @@
     </script>
 </body>
 </html>
+
 
 
