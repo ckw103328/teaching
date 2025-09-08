@@ -383,27 +383,6 @@
             line-height: 1.5;
         }
         
-        .music-control {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #ffde59;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #ffb300;
-            z-index: 20;
-        }
-        
-        .music-control i {
-            font-size: 24px;
-            color: #e62129;
-        }
-        
         /* 响应式设计 - 增强版 */
         @media (max-width: 1200px) {
             .container {
@@ -589,17 +568,6 @@
                 right: 8px;
             }
             
-            .music-control {
-                width: 40px;
-                height: 40px;
-                top: 15px;
-                right: 15px;
-            }
-            
-            .music-control i {
-                font-size: 20px;
-            }
-            
             .instructions {
                 font-size: 1rem;
                 margin: 10px 0;
@@ -731,10 +699,6 @@
             <h1>中國美食守衛隊</h1>
         </div>
         
-        <div class="music-control" id="music-control">
-            <i class="fas fa-volume-up"></i>
-        </div>
-        
         <div class="game-area">
             <div class="top-area">
                 <div class="black-hole"></div>
@@ -802,20 +766,12 @@
     </div>
     
     <div class="instructions">
-        <p>小老鼠想偷走北京美食！點撃被拖走的美食卡片保護它們！老鼠只會出動7次。</p>
+        <p>小老鼠想偷走北京美食！點撃被拖走的美食卡片保護它們！老鼠只會出動7次，每個食物都會被攻擊至少一次。</p>
     </div>
     
     <button class="reset-btn"><i class="fas fa-redo"></i> 重新開始</button>
     
     <div class="celebration" id="celebration"></div>
-    
-    <audio id="error-sound" preload="auto">
-        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADwADw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PD//////////////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAA8DpJc1TAAAAAAD/+9DEAAAIpANLtAAACLiA6fcwwABBJiZ5mZgAACLi4极简错误音效" type="audio/mpeg">
-    </audio>
-    
-    <audio id="bg-music" loop preload="auto">
-        <source src="https://assets.mixkit.co/music/preview/mixkit-happy-times-158.mp3" type="audio/mpeg">
-    </audio>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -829,10 +785,6 @@
             const gameOver = document.querySelector('.game-over');
             const savedCount = document.getElementById('saved-count');
             const celebration = document.getElementById('celebration');
-            const errorSound = document.getElementById('error-sound');
-            const bgMusic = document.getElementById('bg-music');
-            const musicControl = document.getElementById('music-control');
-            const musicIcon = musicControl.querySelector('i');
             
             // 游戏状态
             let gameActive = false;
@@ -840,16 +792,13 @@
             let savedFoods = 0;
             let currentTarget = null;
             let mouseMoving = false;
-            let musicPlaying = false;
+            let targetFoods = []; // 存储目标食物列表
             
             // 开始游戏
             startBtn.addEventListener('click', startGame);
             
             // 重置游戲
             resetBtn.addEventListener('click', resetGame);
-            
-            // 音乐控制
-            musicControl.addEventListener('click', toggleMusic);
             
             // 点击食物卡片
             foodCards.forEach(card => {
@@ -905,6 +854,9 @@
                 savedCount.textContent = savedFoods;
                 attemptsDisplay.textContent = 0;
                 
+                // 生成目标食物列表 - 确保每个食物至少被攻击一次
+                generateTargetFoods();
+                
                 // 隐藏游戏结束画面
                 gameOver.style.display = 'none';
                 
@@ -913,25 +865,40 @@
                 
                 // 禁用开始按钮
                 startBtn.disabled = true;
+            }
+            
+            // 生成目标食物列表
+            function generateTargetFoods() {
+                targetFoods = [];
                 
-                // 自动播放背景音乐
-                if (!musicPlaying) {
-                    toggleMusic();
+                // 首先确保每个食物至少出现一次
+                const allFoods = Array.from(foodCards);
+                const shuffledFoods = [...allFoods].sort(() => Math.random() - 0.5);
+                
+                // 添加所有食物
+                targetFoods.push(...shuffledFoods);
+                
+                // 如果还需要更多目标，随机选择食物
+                while (targetFoods.length < 7) {
+                    const randomIndex = Math.floor(Math.random() * allFoods.length);
+                    targetFoods.push(allFoods[randomIndex]);
                 }
+                
+                // 确保只有7个目标
+                targetFoods = targetFoods.slice(0, 7);
             }
             
             // 移动老鼠
             function moveMouse() {
                 if (!gameActive || mouseMoving) return;
                 
-                // 选择随机目标
-                const availableCards = Array.from(foodCards).filter(card => card.style.display !== 'none');
-                if (availableCards.length === 0) {
+                // 从目标列表中获取下一个目标
+                if (targetFoods.length === 0) {
                     endGame();
                     return;
                 }
                 
-                const targetCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+                const targetCard = targetFoods.shift();
                 const rect = targetCard.getBoundingClientRect();
                 const containerRect = document.querySelector('.game-area').getBoundingClientRect();
                 
@@ -963,9 +930,6 @@
                     
                     // 隐藏被拖走的食物
                     targetCard.style.display = 'none';
-                    
-                    // 播放错误音效
-                    errorSound.play();
                     
                     // 显示遗憾表情
                     feedback.textContent = '😢';
@@ -1008,10 +972,10 @@
                     showCelebration();
                     
                     // 显示胜利消息
-                    gameOver.innerHTML = '<div>太棒了!</div><div>你成功守衛了所有北京美食!</div>';
+                    gameOver.innerHTML = '<div>太棒了!</div><div>你成功守衛了所有中國美食!</div>';
                 } else {
                     // 显示失败消息
-                    gameOver.innerHTML = '<div>遊戲結束!</div><div>成功守衛了北京美食: ' + savedFoods + '/7</div>';
+                    gameOver.innerHTML = '<div>遊戲結束!</div><div>成功守衛了中國美食: ' + savedFoods + '/7</div>';
                 }
                 gameOver.style.display = 'flex';
             }
@@ -1045,20 +1009,6 @@
                 
                 // 启用开始按钮
                 startBtn.disabled = false;
-            }
-            
-            // 切换音乐
-            function toggleMusic() {
-                if (musicPlaying) {
-                    bgMusic.pause();
-                    musicIcon.className = 'fas fa-volume-mute';
-                } else {
-                    bgMusic.play().catch(e => {
-                        console.log("音频播放失败，需要用户交互: ", e);
-                    });
-                    musicIcon.className = 'fas fa-volume-up';
-                }
-                musicPlaying = !musicPlaying;
             }
             
             // 庆祝动画
