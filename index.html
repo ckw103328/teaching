@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北京美食守衛隊 - 实物图片版</title>
+    <title>中國美食守衛隊 - 实物图片版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -21,7 +21,7 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
-            overflow: hidden;
+            overflow-x: hidden;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><path d="M20,20C30,10 70,10 80,20C90,30 90,70 80,80C70,90 30,90 20,80C10,70 10,30 20,20Z" fill="none" stroke="%23ffccbc" stroke-width="2"/></svg>');
             background-repeat: repeat;
         }
@@ -29,6 +29,7 @@
         .container {
             width: 100%;
             max-width: 1200px;
+            min-height: 500px;
             aspect-ratio: 4/3;
             background: rgba(255, 253, 245, 0.95);
             border-radius: 25px;
@@ -88,7 +89,7 @@
             border-top: 3px solid #ffde59;
         }
         
-        .timer {
+        .attempts-counter {
             background: #ffde59;
             padding: 12px 25px;
             border-radius: 50px;
@@ -243,9 +244,12 @@
         .food-cards {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 15px;
             padding: 0 20px;
             width: 100%;
+            max-height: 100%;
+            overflow-y: auto;
         }
         
         .food-card {
@@ -400,15 +404,22 @@
             color: #e62129;
         }
         
-        /* 响应式设计 */
-        @media (max-width: 900px) {
+        /* 响应式设计 - 增强版 */
+        @media (max-width: 1200px) {
             .container {
                 max-width: 95%;
             }
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                max-width: 95%;
+                aspect-ratio: 3/4;
+                min-height: auto;
+            }
             
             .food-cards {
-                flex-wrap: wrap;
-                gap: 15px;
+                gap: 10px;
             }
             
             .food-card {
@@ -424,7 +435,7 @@
                 font-size: 2.2rem;
             }
             
-            .timer {
+            .attempts-counter {
                 font-size: 1.5rem;
                 padding: 10px 20px;
             }
@@ -433,9 +444,27 @@
                 font-size: 1.2rem;
                 padding: 10px 20px;
             }
+            
+            .top-area {
+                height: 22%;
+            }
+            
+            .bottom-area {
+                height: 78%;
+                padding-bottom: 15px;
+            }
         }
         
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            .container {
+                aspect-ratio: auto;
+                min-height: 600px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
             .food-card {
                 width: 100px;
                 height: 120px;
@@ -446,22 +475,83 @@
             }
             
             .food-name {
-                font-size: 0.8rem;
-                padding: 5px 3px;
+                font-size: 0.9rem;
+                padding: 6px 3px;
+            }
+            
+            .controls {
+                padding: 10px 15px;
+            }
+            
+            .attempts-counter {
+                font-size: 1.3rem;
+                padding: 8px 15px;
+            }
+            
+            .start-btn, .reset-btn {
+                font-size: 1.1rem;
+                padding: 8px 15px;
+            }
+            
+            .black-hole {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .mouse-container {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+                justify-content: flex-start;
+            }
+            
+            .container {
+                width: 100%;
+                min-height: 500px;
+                border-width: 8px;
+                border-radius: 20px;
             }
             
             h1 {
                 font-size: 1.8rem;
             }
             
-            .timer {
-                font-size: 1.2rem;
-                padding: 8px 15px;
+            .header {
+                padding: 10px;
+            }
+            
+            .food-cards {
+                gap: 8px;
+                padding: 0 10px;
+            }
+            
+            .food-card {
+                width: 85px;
+                height: 105px;
+            }
+            
+            .food-image {
+                height: 65px;
+            }
+            
+            .food-name {
+                font-size: 0.8rem;
+                padding: 5px 2px;
+            }
+            
+            .attempts-counter {
+                font-size: 1.1rem;
+                padding: 6px 12px;
             }
             
             .start-btn, .reset-btn {
                 font-size: 1rem;
-                padding: 8px 15px;
+                padding: 6px 12px;
             }
             
             .black-hole {
@@ -470,8 +560,167 @@
             }
             
             .mouse-container {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .mouse-body {
+                width: 40px;
+                height: 28px;
+            }
+            
+            .mouse-ear {
+                width: 16px;
+                height: 16px;
+                top: -8px;
+            }
+            
+            .mouse-eye {
+                width: 6px;
+                height: 6px;
+                top: 8px;
+            }
+            
+            .mouse-eye.left {
+                left: 8px;
+            }
+            
+            .mouse-eye.right {
+                right: 8px;
+            }
+            
+            .music-control {
+                width: 40px;
+                height: 40px;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .music-control i {
+                font-size: 20px;
+            }
+            
+            .instructions {
+                font-size: 1rem;
+                margin: 10px 0;
+            }
+            
+            .reset-btn {
+                margin-top: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                min-height: 450px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .food-cards {
+                gap: 6px;
+            }
+            
+            .food-card {
+                width: 75px;
+                height: 95px;
+            }
+            
+            .food-image {
+                height: 60px;
+            }
+            
+            .food-name {
+                font-size: 0.7rem;
+            }
+            
+            .top-area {
+                height: 20%;
+            }
+            
+            .bottom-area {
+                height: 80%;
+                padding-bottom: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .attempts-counter, .start-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .game-over {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .food-card {
+                width: 65px;
+                height: 85px;
+            }
+            
+            .food-image {
+                height: 55px;
+            }
+            
+            .food-name {
+                font-size: 0.65rem;
+                padding: 4px 1px;
+            }
+            
+            .attempts-counter {
+                font-size: 1rem;
+            }
+            
+            .start-btn, .reset-btn {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* 横屏设备适配 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                min-height: 300px;
+                aspect-ratio: 16/9;
+            }
+            
+            .top-area {
+                height: 30%;
+            }
+            
+            .bottom-area {
+                height: 70%;
+                padding-bottom: 10px;
+            }
+            
+            .food-card {
+                width: 80px;
+                height: 90px;
+            }
+            
+            .food-image {
+                height: 55px;
+            }
+            
+            .food-name {
+                font-size: 0.7rem;
+                padding: 4px 2px;
             }
         }
     </style>
@@ -479,7 +728,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>北京美食守衛隊</h1>
+            <h1>中國美食守衛隊</h1>
         </div>
         
         <div class="music-control" id="music-control">
@@ -548,12 +797,12 @@
         
         <div class="controls">
             <button class="start-btn"><i class="fas fa-play"></i> 開始遊戲</button>
-            <div class="timer"><i class="fas fa-clock"></i> <span id="time">01:00</span></div>
+            <div class="attempts-counter"><i class="fas fa-mouse"></i> 出動: <span id="attempts">0</span>/7</div>
         </div>
     </div>
     
     <div class="instructions">
-        <p>小老鼠想偷走北京美食！點撃被拖走的美食卡片保護它們！</p>
+        <p>小老鼠想偷走北京美食！點撃被拖走的美食卡片保護它們！老鼠只會出動7次。</p>
     </div>
     
     <button class="reset-btn"><i class="fas fa-redo"></i> 重新開始</button>
@@ -573,7 +822,7 @@
             // 游戏元素
             const startBtn = document.querySelector('.start-btn');
             const resetBtn = document.querySelector('.reset-btn');
-            const timerDisplay = document.getElementById('time');
+            const attemptsDisplay = document.getElementById('attempts');
             const mouse = document.querySelector('.mouse-container');
             const foodCards = document.querySelectorAll('.food-card');
             const feedback = document.querySelector('.feedback');
@@ -587,8 +836,7 @@
             
             // 游戏状态
             let gameActive = false;
-            let timeLeft = 60;
-            let timer;
+            let attemptsLeft = 7;
             let savedFoods = 0;
             let currentTarget = null;
             let mouseMoving = false;
@@ -633,9 +881,13 @@
                     savedFoods++;
                     savedCount.textContent = savedFoods;
                     
-                    // 检查是否所有食物都被保存
-                    if (savedFoods === 7) {
-                        endGame(true);
+                    // 减少尝试次数
+                    attemptsLeft--;
+                    attemptsDisplay.textContent = 7 - attemptsLeft;
+                    
+                    // 检查游戏是否结束
+                    if (attemptsLeft <= 0) {
+                        endGame();
                     } else {
                         // 老鼠返回后继续寻找下一个目标
                         setTimeout(moveMouse, 1500);
@@ -648,15 +900,13 @@
                 if (gameActive) return;
                 
                 gameActive = true;
-                timeLeft = 60;
+                attemptsLeft = 7;
                 savedFoods = 0;
                 savedCount.textContent = savedFoods;
+                attemptsDisplay.textContent = 0;
                 
                 // 隐藏游戏结束画面
                 gameOver.style.display = 'none';
-                
-                // 启动计时器
-                timer = setInterval(updateTimer, 1000);
                 
                 // 开始老鼠移动
                 setTimeout(moveMouse, 1000);
@@ -670,27 +920,16 @@
                 }
             }
             
-            // 更新计时器
-            function updateTimer() {
-                timeLeft--;
-                
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (timeLeft <= 0) {
-                    endGame(false);
-                }
-            }
-            
             // 移动老鼠
             function moveMouse() {
                 if (!gameActive || mouseMoving) return;
                 
                 // 选择随机目标
                 const availableCards = Array.from(foodCards).filter(card => card.style.display !== 'none');
-                if (availableCards.length === 0) return;
+                if (availableCards.length === 0) {
+                    endGame();
+                    return;
+                }
                 
                 const targetCard = availableCards[Math.floor(Math.random() * availableCards.length)];
                 const rect = targetCard.getBoundingClientRect();
@@ -736,14 +975,17 @@
                         feedback.style.opacity = '0';
                     }, 1000);
                     
+                    // 减少尝试次数
+                    attemptsLeft--;
+                    attemptsDisplay.textContent = 7 - attemptsLeft;
+                    
                     // 重置老鼠状态
                     setTimeout(() => {
                         mouseMoving = false;
                         
-                        // 检查是否所有食物都被偷走
-                        const remainingCards = Array.from(foodCards).filter(card => card.style.display !== 'none');
-                        if (remainingCards.length === 0) {
-                            endGame(false);
+                        // 检查游戏是否结束
+                        if (attemptsLeft <= 0) {
+                            endGame();
                         } else if (gameActive) {
                             // 继续移动老鼠
                             setTimeout(moveMouse, 1500);
@@ -753,36 +995,34 @@
             }
             
             // 结束游戏
-            function endGame(victory) {
+            function endGame() {
                 gameActive = false;
-                clearInterval(timer);
                 mouseMoving = false;
                 
                 // 启用开始按钮
                 startBtn.disabled = false;
                 
-                if (victory) {
+                // 显示结果消息
+                if (savedFoods === 7) {
                     // 显示庆祝动画
                     showCelebration();
                     
                     // 显示胜利消息
-                    gameOver.innerHTML = '<div>太棒了!</div><div>你成功守衛了北京美食!</div>';
-                    gameOver.style.display = 'flex';
+                    gameOver.innerHTML = '<div>太棒了!</div><div>你成功守衛了所有北京美食!</div>';
                 } else {
                     // 显示失败消息
                     gameOver.innerHTML = '<div>遊戲結束!</div><div>成功守衛了北京美食: ' + savedFoods + '/7</div>';
-                    gameOver.style.display = 'flex';
                 }
+                gameOver.style.display = 'flex';
             }
             
             // 重置游戏
             function resetGame() {
-                clearInterval(timer);
                 gameActive = false;
                 mouseMoving = false;
                 
-                // 重置计时器显示
-                timerDisplay.textContent = '01:00';
+                // 重置尝试次数显示
+                attemptsDisplay.textContent = '0';
                 
                 // 显示所有食物卡片
                 foodCards.forEach(card => {
@@ -846,7 +1086,3 @@
     </script>
 </body>
 </html>
-
-
-
-
